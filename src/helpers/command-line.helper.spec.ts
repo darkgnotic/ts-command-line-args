@@ -13,7 +13,7 @@ describe('command-line.helper', () => {
     function getConfig(): ArgumentConfig<ComplexProperties> {
         return {
             requiredStringOne: String,
-            requiredStringTwo: { type: String, env: 'REQUIRED_STRING_TWO' },
+            requiredStringTwo: { type: String, env: 'REQUIRED_STRING_TWO', description: 'string two description' },
             optionalString: { type: String, optional: true, env: 'OPTIONAL_STRING' },
             requiredArray: { type: String, multiple: true, env: 'REQUIRED_ARRAY' },
             optionalArray: { type: String, lazyMultiple: true, optional: true, env: 'OPTIONAL_ARRAY' },
@@ -26,7 +26,7 @@ describe('command-line.helper', () => {
 
             expect(normalised).toEqual({
                 requiredStringOne: { type: String },
-                requiredStringTwo: { type: String, env: 'REQUIRED_STRING_TWO' },
+                requiredStringTwo: { type: String, env: 'REQUIRED_STRING_TWO', description: 'string two description' },
                 optionalString: { type: String, optional: true, env: 'OPTIONAL_STRING' },
                 requiredArray: { type: String, multiple: true, env: 'REQUIRED_ARRAY' },
                 optionalArray: { type: String, lazyMultiple: true, optional: true, env: 'OPTIONAL_ARRAY' },
@@ -40,10 +40,20 @@ describe('command-line.helper', () => {
 
             expect(commandLineConfig).toEqual([
                 { name: 'requiredStringOne', type: String },
-                { name: 'requiredStringTwo', type: String },
-                { name: 'optionalString', type: String, optional: true },
-                { name: 'requiredArray', type: String, multiple: true },
-                { name: 'optionalArray', type: String, lazyMultiple: true, optional: true },
+                {
+                    name: 'requiredStringTwo',
+                    type: String,
+                    description: 'string two description (ENV: REQUIRED_STRING_TWO)',
+                },
+                { name: 'optionalString', type: String, optional: true, description: '(ENV: OPTIONAL_STRING)' },
+                { name: 'requiredArray', type: String, multiple: true, description: '(ENV: REQUIRED_ARRAY)' },
+                {
+                    name: 'optionalArray',
+                    type: String,
+                    lazyMultiple: true,
+                    optional: true,
+                    description: '(ENV: OPTIONAL_ARRAY)',
+                },
             ]);
         });
     });

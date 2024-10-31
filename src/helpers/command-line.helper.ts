@@ -4,11 +4,15 @@ import { isBoolean } from './options.helper';
 export function createCommandLineConfig<T>(config: ArgumentOptions<T>): CommandLineOption[] {
     return Object.keys(config).map((key) => {
         const argConfig: any = config[key as keyof T];
-        const definition: PropertyOptions<any> = typeof argConfig === 'object' ? argConfig : { type: argConfig };
+        const definitionWithEnv: PropertyOptions<any> = typeof argConfig === 'object' ? argConfig : { type: argConfig };
 
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { env, ...definitionWithoutEnv } = definition;
-        return { name: key, ...definitionWithoutEnv };
+        // Append "... (ENV: FOO_BAR)" to the description.
+        const { env, ...definition } = definitionWithEnv;
+        if (env) {
+            const { description: desc } = definition;
+            definition.description = `${desc ? desc + ' ' : ''}(ENV: ${env})`;
+        }
+        return { name: key, ...definition };
     });
 }
 
