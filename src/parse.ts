@@ -24,7 +24,15 @@ import {
 import { addOptions, getOptionFooterSection, getOptionSections } from './helpers/options.helper';
 import { removeAdditionalFormatting } from './helpers/string.helper';
 
-function parseCommandLineArgs(optionList: commandLineArgs.OptionDefinition[], options?: commandLineArgs.ParseOptions) {
+function parseCommandLineArgs(
+    optionList: commandLineArgs.OptionDefinition[],
+    options: commandLineArgs.ParseOptions,
+    includeDefaults: boolean,
+) {
+    if (!includeDefaults) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        optionList = optionList.map(({ defaultValue, ...option }) => option);
+    }
     let parsedArgs = commandLineArgs(optionList, options) as any;
 
     if (parsedArgs['_all'] != null) {
@@ -57,7 +65,7 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
     const normalisedConfig = normaliseConfig(config);
     options.argv = removeBooleanValues(argsWithBooleanValues, normalisedConfig);
     const optionList = createCommandLineConfig(normalisedConfig);
-    const parsedArgsWithDefaults = parseCommandLineArgs(optionList, options) as any;
+    const parsedArgsWithDefaults = parseCommandLineArgs(optionList, options, true) as any;
     const parsedArgsFromConfig =
         options.loadFromFileArg != null && parsedArgsWithDefaults[options.loadFromFileArg] != null
             ? parseConfigFromFile<T>(
@@ -66,13 +74,12 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
                   normalisedConfig,
               )
             : {};
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const optionListWithoutDefaults = optionList.map(({ defaultValue, ...option }) => option);
-    const parsedArgsFromEnv = parseCommandLineArgs(optionListWithoutDefaults, {
-        ...options,
-        argv: createEnvArgv(normalisedConfig),
-    }) as any;
-    const parsedArgsWithoutDefaults = parseCommandLineArgs(optionListWithoutDefaults, options) as any;
+    const parsedArgsFromEnv = parseCommandLineArgs(
+        optionList,
+        { ...options, argv: createEnvArgv(normalisedConfig) },
+        false,
+    ) as any;
+    const parsedArgsWithoutDefaults = parseCommandLineArgs(optionList, options, false) as any;
     const booleanValues = getBooleanValues(argsWithBooleanValues, normalisedConfig);
 
     const parsedArgs = {
