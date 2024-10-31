@@ -673,8 +673,8 @@ parse<IMyInterface>({
     });
 ```
 
-in which case, the existing of a corresponding value in `process.env` will override any default value defined for the option,
-or a value coming from a config file. An explicit command line argument, however, will take precedence over
+for which a corresponding value in `process.env` overrides any default value defined for the option,
+or a value coming from a config file. An explicit command line argument, however, takes precedence over
 the environment variable.
 
 ### Options
