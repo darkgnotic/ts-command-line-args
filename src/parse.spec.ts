@@ -1,19 +1,19 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
+import { ArgumentConfig, ProcessExitCodeFunction } from './contracts';
 import {
-    addMatchers,
-    any,
     IMocked,
     Mock,
-    registerMock,
-    replacePropertiesBeforeEach,
-    reset,
     setupFunction,
+    replacePropertiesBeforeEach,
+    addMatchers,
+    registerMock,
+    reset,
+    any,
 } from '@morgan-stanley/ts-mocking-bird';
+import { parse } from './parse';
 import * as fsImport from 'fs';
 import * as pathImport from 'path';
-import { ArgumentConfig, ProcessExitCodeFunction } from './contracts';
-import * as helpersImport from './helpers/index';
-import { parse } from './parse';
+import * as helpersImport from './helpers';
 
 jest.mock('fs', () => require('@morgan-stanley/ts-mocking-bird').proxyJestModule(require.resolve('fs')));
 jest.mock('path', () => require('@morgan-stanley/ts-mocking-bird').proxyJestModule(require.resolve('path')));

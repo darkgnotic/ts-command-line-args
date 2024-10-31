@@ -1,28 +1,28 @@
-import commandLineArgs from 'command-line-args';
-import commandLineUsage from 'command-line-usage';
-import { readFileSync } from 'fs';
-import { resolve } from 'path';
 import {
     ArgumentConfig,
-    CommandLineOption,
-    CommandLineResults,
-    Content,
-    ExitReason,
     ParseOptions,
     UnknownProperties,
+    CommandLineOption,
     UsageGuideOptions,
+    Content,
+    CommandLineResults,
+    ExitReason,
 } from './contracts';
+import commandLineArgs from 'command-line-args';
+import commandLineUsage from 'command-line-usage';
 import {
     createCommandLineConfig,
     createEnvArgv,
     getBooleanValues,
-    normaliseConfig,
     parseConfigFromFile,
+    normaliseConfig,
     removeBooleanValues,
     visit,
-} from './helpers/index';
-import { addOptions, getOptionFooterSection, getOptionSections } from './helpers/options.helper';
-import { removeAdditionalFormatting } from './helpers/string.helper';
+} from './helpers/index.js';
+import { addOptions, getOptionFooterSection, getOptionSections } from './helpers/options.helper.js';
+import { removeAdditionalFormatting } from './helpers/string.helper.js';
+import { readFileSync } from 'fs';
+import { resolve } from 'path';
 
 function parseCommandLineArgs(
     optionList: commandLineArgs.OptionDefinition[],

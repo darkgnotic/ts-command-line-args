@@ -1,5 +1,5 @@
+import { createCommandLineConfig, createEnvArgv, parseConfigFromFile, normaliseConfig } from './command-line.helper';
 import { ArgumentConfig, ArgumentOptions } from '../contracts';
-import { createCommandLineConfig, createEnvArgv, normaliseConfig, parseConfigFromFile } from './command-line.helper';
 
 describe('command-line.helper', () => {
     interface ComplexProperties {
