@@ -10,7 +10,7 @@ export function createCommandLineConfig<T>(config: ArgumentOptions<T>): CommandL
         const { env, ...definition } = definitionWithEnv;
         if (env) {
             const { description: desc } = definition;
-            definition.description = `${desc ? desc + ' ' : ''}(ENV: ${env})`;
+            definition.description = `${desc ? desc + ' ' : ''}(env: ${env})`;
         }
         return { name: key, ...definition };
     });

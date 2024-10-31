@@ -43,16 +43,16 @@ describe('command-line.helper', () => {
                 {
                     name: 'requiredStringTwo',
                     type: String,
-                    description: 'string two description (ENV: REQUIRED_STRING_TWO)',
+                    description: 'string two description (env: REQUIRED_STRING_TWO)',
                 },
-                { name: 'optionalString', type: String, optional: true, description: '(ENV: OPTIONAL_STRING)' },
-                { name: 'requiredArray', type: String, multiple: true, description: '(ENV: REQUIRED_ARRAY)' },
+                { name: 'optionalString', type: String, optional: true, description: '(env: OPTIONAL_STRING)' },
+                { name: 'requiredArray', type: String, multiple: true, description: '(env: REQUIRED_ARRAY)' },
                 {
                     name: 'optionalArray',
                     type: String,
                     lazyMultiple: true,
                     optional: true,
-                    description: '(ENV: OPTIONAL_ARRAY)',
+                    description: '(env: OPTIONAL_ARRAY)',
                 },
             ]);
         });
