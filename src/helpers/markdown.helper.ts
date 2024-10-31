@@ -1,20 +1,20 @@
+import { join } from 'path';
+import { pathToFileURL } from 'url';
 import {
-    UsageGuideConfig,
-    JsImport,
-    IWriteMarkDown,
     ArgumentConfig,
     CommandLineOption,
-    ParseOptions,
     Content,
     HeaderLevel,
+    IWriteMarkDown,
+    JsImport,
     OptionContent,
+    ParseOptions,
     SectionHeader,
+    UsageGuideConfig,
 } from '../contracts';
-import { join } from 'path';
-import { normaliseConfig, createCommandLineConfig } from './command-line.helper.js';
-import { generateTableFooter, getOptionSections, mapDefinitionDetails } from './options.helper.js';
-import { convertChalkStringToMarkdown } from './string.helper.js';
-import { pathToFileURL } from 'url';
+import { createCommandLineConfig, normaliseConfig } from './command-line.helper';
+import { generateTableFooter, getOptionSections, mapDefinitionDetails } from './options.helper';
+import { convertChalkStringToMarkdown } from './string.helper';
 
 export function createUsageGuide<T = any>(config: UsageGuideConfig<T>): string {
     const options = config.parseOptions || {};

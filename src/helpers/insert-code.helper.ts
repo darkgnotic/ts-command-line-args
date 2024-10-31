@@ -1,9 +1,9 @@
-import { IInsertCodeOptions } from '../contracts';
-import { filterDoubleBlankLines, findEscapeSequence, splitContent } from './line-ending.helper.js';
-import { isAbsolute, resolve, dirname, join } from 'path';
-import { promisify } from 'util';
-import { readFile, writeFile } from 'fs';
 import chalk from 'chalk';
+import { readFile, writeFile } from 'fs';
+import { dirname, isAbsolute, join, resolve } from 'path';
+import { promisify } from 'util';
+import { IInsertCodeOptions } from '../contracts';
+import { filterDoubleBlankLines, findEscapeSequence, splitContent } from './line-ending.helper';
 
 const asyncReadFile = promisify(readFile);
 const asyncWriteFile = promisify(writeFile);

@@ -1,6 +1,6 @@
 import { IReplaceOptions } from '../contracts';
-import { footerReplaceBelowMarker } from '../write-markdown.constants.js';
-import { splitContent, findEscapeSequence, filterDoubleBlankLines } from './line-ending.helper.js';
+import { footerReplaceBelowMarker } from '../write-markdown.constants';
+import { filterDoubleBlankLines, findEscapeSequence, splitContent } from './line-ending.helper';
 
 /**
  * Adds or replaces content between 2 markers within a text string

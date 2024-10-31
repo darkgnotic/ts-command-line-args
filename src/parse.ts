@@ -1,27 +1,41 @@
-import {
-    ArgumentConfig,
-    ParseOptions,
-    UnknownProperties,
-    CommandLineOption,
-    UsageGuideOptions,
-    Content,
-    CommandLineResults,
-    ExitReason,
-} from './contracts';
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
-import {
-    createCommandLineConfig,
-    getBooleanValues,
-    mergeConfig,
-    normaliseConfig,
-    removeBooleanValues,
-    visit,
-} from './helpers/index.js';
-import { addOptions, getOptionFooterSection, getOptionSections } from './helpers/options.helper.js';
-import { removeAdditionalFormatting } from './helpers/string.helper.js';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
+import {
+    ArgumentConfig,
+    CommandLineOption,
+    CommandLineResults,
+    Content,
+    ExitReason,
+    ParseOptions,
+    UnknownProperties,
+    UsageGuideOptions,
+} from './contracts';
+import {
+    createCommandLineConfig,
+    createEnvArgv,
+    getBooleanValues,
+    normaliseConfig,
+    parseConfigFromFile,
+    removeBooleanValues,
+    visit,
+} from './helpers/index';
+import { addOptions, getOptionFooterSection, getOptionSections } from './helpers/options.helper';
+import { removeAdditionalFormatting } from './helpers/string.helper';
+
+function parseCommandLineArgs(optionList: commandLineArgs.OptionDefinition[], options?: commandLineArgs.ParseOptions) {
+    let parsedArgs = commandLineArgs(optionList, options) as any;
+
+    if (parsedArgs['_all'] != null) {
+        const unknown = parsedArgs['_unknown'];
+        parsedArgs = parsedArgs['_all'];
+        if (unknown) {
+            parsedArgs['_unknown'] = unknown;
+        }
+    }
+    return parsedArgs;
+}
 
 /**
  * parses command line arguments and returns an object with all the arguments in IF all required options passed
@@ -43,37 +57,34 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
     const normalisedConfig = normaliseConfig(config);
     options.argv = removeBooleanValues(argsWithBooleanValues, normalisedConfig);
     const optionList = createCommandLineConfig(normalisedConfig);
-    let parsedArgs = commandLineArgs(optionList, options) as any;
+    let parsedArgs = parseCommandLineArgs(optionList, options) as any;
 
-    if (parsedArgs['_all'] != null) {
-        const unknown = parsedArgs['_unknown'];
-        parsedArgs = parsedArgs['_all'];
-        if (unknown) {
-            parsedArgs['_unknown'] = unknown;
-        }
-    }
-
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const optionListWithoutDefaults = optionList.map(({ defaultValue, ...option }) => option);
+    const parsedArgsFromEnv = parseCommandLineArgs(optionListWithoutDefaults, {
+        ...options,
+        argv: createEnvArgv(normalisedConfig),
+    }) as any;
+    const parsedArgsWithoutDefaults = parseCommandLineArgs(optionListWithoutDefaults, options) as any;
     const booleanValues = getBooleanValues(argsWithBooleanValues, normalisedConfig);
-    parsedArgs = { ...parsedArgs, ...booleanValues };
 
-    if (options.loadFromFileArg != null && parsedArgs[options.loadFromFileArg] != null) {
-        const configFromFile: Partial<Record<keyof T, any>> = JSON.parse(
-            readFileSync(resolve(parsedArgs[options.loadFromFileArg])).toString(),
-        );
-        const parsedArgsWithoutDefaults = commandLineArgs(
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            optionList.map(({ defaultValue, ...option }) => ({ ...option })),
-            options,
-        ) as any;
+    const parsedArgsFromConfig =
+        options.loadFromFileArg != null && parsedArgs[options.loadFromFileArg] != null
+            ? parseConfigFromFile<T>(
+                  { ...parsedArgs, ...booleanValues },
+                  JSON.parse(readFileSync(resolve(parsedArgs[options.loadFromFileArg])).toString()),
+                  normalisedConfig,
+                  options.loadFromFileJsonPathArg as keyof T | undefined,
+              )
+            : {};
 
-        parsedArgs = mergeConfig<T>(
-            parsedArgs,
-            { ...parsedArgsWithoutDefaults, ...booleanValues },
-            configFromFile,
-            normalisedConfig,
-            options.loadFromFileJsonPathArg as keyof T | undefined,
-        );
-    }
+    parsedArgs = {
+        ...parsedArgs,
+        ...parsedArgsFromConfig,
+        ...parsedArgsFromEnv,
+        ...parsedArgsWithoutDefaults,
+        ...booleanValues,
+    };
 
     const missingArgs = listMissingArgs(optionList, parsedArgs);
 

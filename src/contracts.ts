@@ -53,6 +53,13 @@ export type PropertyOptions<T> = {
     defaultValue?: T;
 
     /**
+     * The environment variable that will override the flag's `defaultValue` or value
+     * from the loaded configuration file. An explicit command-line argument will override
+     * the environment variable.
+     */
+    env?: string;
+
+    /**
      * When your app has a large amount of options it makes sense to organise them in groups.
      *
      * There are two automatic groups: _all (contains all options) and _none (contains options without a group specified in their definition).
