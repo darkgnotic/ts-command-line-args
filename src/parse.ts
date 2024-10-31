@@ -27,9 +27,9 @@ import { resolve } from 'path';
 function parseCommandLineArgs(
     optionList: commandLineArgs.OptionDefinition[],
     options: commandLineArgs.ParseOptions,
-    includeDefaults: boolean,
+    defaults: 'include-defaults' | 'exclude-defaults' = 'include-defaults',
 ) {
-    if (!includeDefaults) {
+    if (defaults === 'exclude-defaults') {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         optionList = optionList.map(({ defaultValue, ...option }) => option);
     }
@@ -65,7 +65,7 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
     const normalisedConfig = normaliseConfig(config);
     options.argv = removeBooleanValues(argsWithBooleanValues, normalisedConfig);
     const optionList = createCommandLineConfig(normalisedConfig);
-    const parsedArgsWithDefaults = parseCommandLineArgs(optionList, options, true) as any;
+    const parsedArgsWithDefaults = parseCommandLineArgs(optionList, options);
     const parsedArgsFromConfig =
         options.loadFromFileArg != null && parsedArgsWithDefaults[options.loadFromFileArg] != null
             ? parseConfigFromFile<T>(
@@ -77,9 +77,9 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
     const parsedArgsFromEnv = parseCommandLineArgs(
         optionList,
         { ...options, argv: createEnvArgv(normalisedConfig) },
-        false,
-    ) as any;
-    const parsedArgsWithoutDefaults = parseCommandLineArgs(optionList, options, false) as any;
+        'exclude-defaults',
+    );
+    const parsedArgsWithoutDefaults = parseCommandLineArgs(optionList, options, 'exclude-defaults');
     const booleanValues = getBooleanValues(argsWithBooleanValues, normalisedConfig);
 
     const parsedArgs = {
