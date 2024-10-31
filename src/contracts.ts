@@ -54,8 +54,11 @@ export type PropertyOptions<T> = {
 
     /**
      * The environment variable that will override the flag's `defaultValue` or value
-     * from the loaded configuration file. An explicit command-line argument will override
-     * the environment variable.
+     * from the loaded configuration file. An explicit command-line argument, however,
+     * will take precedence over the environment variable.
+     *
+     * Specifying an `env` value will automatically result in appending " (env: <VAR_NAME>)"
+     * to the option `description`.
      */
     env?: string;
 
