@@ -6,7 +6,7 @@ export function createCommandLineConfig<T>(config: ArgumentOptions<T>): CommandL
         const argConfig: any = config[key as keyof T];
         const definitionWithEnv: PropertyOptions<any> = typeof argConfig === 'object' ? argConfig : { type: argConfig };
 
-        // Append "... (ENV: FOO_BAR)" to the description.
+        // Append "... (env: FOO_BAR)" to the description.
         const { env, ...definition } = definitionWithEnv;
         if (env) {
             const { description: desc } = definition;
