@@ -57,8 +57,15 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
     const normalisedConfig = normaliseConfig(config);
     options.argv = removeBooleanValues(argsWithBooleanValues, normalisedConfig);
     const optionList = createCommandLineConfig(normalisedConfig);
-    let parsedArgs = parseCommandLineArgs(optionList, options) as any;
-
+    const parsedArgsWithDefaults = parseCommandLineArgs(optionList, options) as any;
+    const parsedArgsFromConfig =
+        options.loadFromFileArg != null && parsedArgsWithDefaults[options.loadFromFileArg] != null
+            ? parseConfigFromFile<T>(
+                  parsedArgsWithDefaults[options.loadFromFileJsonPathArg],
+                  JSON.parse(readFileSync(resolve(parsedArgsWithDefaults[options.loadFromFileArg])).toString()),
+                  normalisedConfig,
+              )
+            : {};
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const optionListWithoutDefaults = optionList.map(({ defaultValue, ...option }) => option);
     const parsedArgsFromEnv = parseCommandLineArgs(optionListWithoutDefaults, {
@@ -68,18 +75,8 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
     const parsedArgsWithoutDefaults = parseCommandLineArgs(optionListWithoutDefaults, options) as any;
     const booleanValues = getBooleanValues(argsWithBooleanValues, normalisedConfig);
 
-    const parsedArgsFromConfig =
-        options.loadFromFileArg != null && parsedArgs[options.loadFromFileArg] != null
-            ? parseConfigFromFile<T>(
-                  { ...parsedArgs, ...booleanValues },
-                  JSON.parse(readFileSync(resolve(parsedArgs[options.loadFromFileArg])).toString()),
-                  normalisedConfig,
-                  options.loadFromFileJsonPathArg as keyof T | undefined,
-              )
-            : {};
-
-    parsedArgs = {
-        ...parsedArgs,
+    const parsedArgs = {
+        ...parsedArgsWithDefaults,
         ...parsedArgsFromConfig,
         ...parsedArgsFromEnv,
         ...parsedArgsWithoutDefaults,
@@ -119,11 +116,9 @@ export function parse<T, P extends ParseOptions<T> = ParseOptions<T>, R extends 
     if (missingArgs.length > 0 && exitProcess) {
         process.exit(resolveExitCode(options, 'missingArgs', parsedArgs, missingArgs));
     } else {
-        if (addCommandLineResults) {
-            parsedArgs = { ...parsedArgs, _commandLineResults };
-        }
-
-        return parsedArgs as T & UnknownProperties<P> & CommandLineResults<R>;
+        return (addCommandLineResults ? { ...parsedArgs, _commandLineResults } : parsedArgs) as T &
+            UnknownProperties<P> &
+            CommandLineResults<R>;
     }
 }
 

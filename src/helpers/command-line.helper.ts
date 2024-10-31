@@ -37,12 +37,10 @@ export function normaliseConfig<T>(config: ArgumentConfig<T>): ArgumentOptions<T
 }
 
 export function parseConfigFromFile<T>(
-    parsedConfig: Partial<T>,
+    configPath: string | undefined,
     fileContent: Record<string, unknown>,
     options: ArgumentOptions<T>,
-    jsonPath: keyof T | undefined,
 ): Partial<T> {
-    const configPath: string | undefined = jsonPath ? (parsedConfig[jsonPath] as any) : undefined;
     const configFromFile = resolveConfigFromFile(fileContent, configPath);
     if (configFromFile == null) {
         throw new Error(`Could not resolve config object from specified file and path`);

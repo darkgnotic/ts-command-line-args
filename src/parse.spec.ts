@@ -244,20 +244,10 @@ describe('parse', () => {
                 optionalPathArg: 'configPath',
             });
 
-            const expectedParsedArgs = {
-                defaultedString: 'defaultFromOption',
-                requiredString: 'requiredStringValue',
-                requiredArray: ['requiredArray'],
-                optionalFileArg: 'configFilePath',
-                optionalPathArg: 'configPath',
-            };
-
             expect(mockPath.withFunction('resolve').withParameters('configFilePath')).wasCalledOnce();
             expect(mockFs.withFunction('readFileSync').withParameters('configFilePath_resolved')).wasCalledOnce();
             expect(
-                mockHelper
-                    .withFunction('parseConfigFromFile')
-                    .withParametersEqualTo(expectedParsedArgs, jsonFromFile, any(), 'optionalPathArg' as any),
+                mockHelper.withFunction('parseConfigFromFile').withParametersEqualTo('configPath', jsonFromFile, any()),
             ).wasCalledOnce();
         });
 
@@ -284,20 +274,10 @@ describe('parse', () => {
                 optionalPathArg: 'configPath',
             });
 
-            const expectedParsedArgs = {
-                defaultedString: 'defaultFromOption',
-                requiredString: 'requiredStringValue',
-                requiredArray: ['requiredArray'],
-                optionalFileArg: 'configFilePath',
-                optionalPathArg: 'configPath',
-            };
-
             expect(mockPath.withFunction('resolve').withParameters('configFilePath')).wasCalledOnce();
             expect(mockFs.withFunction('readFileSync').withParameters('configFilePath_resolved')).wasCalledOnce();
             expect(
-                mockHelper
-                    .withFunction('parseConfigFromFile')
-                    .withParametersEqualTo(expectedParsedArgs, jsonFromFile, any(), 'optionalPathArg' as any),
+                mockHelper.withFunction('parseConfigFromFile').withParametersEqualTo('configPath', jsonFromFile, any()),
             ).wasCalledOnce();
         });
 
@@ -305,6 +285,7 @@ describe('parse', () => {
             args: string[];
             configFromFile: Partial<PropertiesWithFileConfig>;
             expected: Partial<PropertiesWithFileConfig>;
+            configPathArg?: string;
         };
 
         const overrideBooleanTests: OveriddeBooleanTest[] = [
@@ -317,6 +298,7 @@ describe('parse', () => {
                 args: ['--requiredBoolean', '--optionalPathArg=optionalPath'],
                 configFromFile: { requiredBoolean: false },
                 expected: { requiredBoolean: true, optionalPathArg: 'optionalPath' },
+                configPathArg: 'optionalPath',
             },
             {
                 args: ['--requiredBoolean=false'],
@@ -367,16 +349,10 @@ describe('parse', () => {
                 });
                 expect(result).toMatchObject(test.expected);
 
-                const expectedParsedArgs = {
-                    defaultedString: 'defaultFromOption',
-                    optionalFileArg: 'configFilePath',
-                    ...test.expected,
-                };
-
                 expect(
                     mockHelper
                         .withFunction('parseConfigFromFile')
-                        .withParametersEqualTo(expectedParsedArgs, jsonFromFile, any(), 'optionalPathArg' as any),
+                        .withParametersEqualTo(test.configPathArg, jsonFromFile, any()),
                 ).wasCalledOnce();
             });
         });

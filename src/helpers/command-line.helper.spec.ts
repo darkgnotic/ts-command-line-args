@@ -119,7 +119,7 @@ describe('command-line.helper', () => {
             it(`should convert all configfromFile properties with type conversion function with input: '${JSON.stringify(
                 test.fromFile,
             )}'`, () => {
-                const result = parseConfigFromFile<ISampleInterface>({}, test.fromFile, options, undefined);
+                const result = parseConfigFromFile<ISampleInterface>(undefined, test.fromFile, options);
 
                 expect(result).toEqual(test.expected);
             });
